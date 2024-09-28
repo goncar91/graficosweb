@@ -1,18 +1,12 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "module": "NodeNext",
-    "moduleResolution": "nodenext",
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "strictPropertyInitialization": false,
-    "baseUrl": "./",
-    "paths": {
-      "*": ["src/*"]
-    },
-    "typeRoots": ["node_modules/@types", "src/declarations.d.ts"]
+    "target": "es6", // Versión de ECMAScript a la que se transpilará
+    "module": "esnext", // Usar módulos ECMAScript
+    "strict": true, // Habilitar verificaciones estrictas
+    "esModuleInterop": true, // Habilitar interoperabilidad de módulos
+    "skipLibCheck": true, // Omitir comprobación de archivos de definición de tipo
+    "forceConsistentCasingInFileNames": true // Forzar el uso consistente de mayúsculas y minúsculas en los nombres de archivos
   },
-  "include": ["src"]
+  "include": ["src/**/*"], // Incluye todos los archivos .ts en la carpeta src
+  "exclude": ["node_modules", "**/*.spec.ts"] // Excluye node_modules y archivos de pruebas
 }

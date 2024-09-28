@@ -1,16 +1,11 @@
 import * as THREE from 'three';
+import groundTextureImage from './assets/suelo/texture.jpg'; // Importa la imagen para que Webpack la procese
+import { MyScene }  from './MyScene';
 
-// Crear la escena
-const scene = new THREE.Scene();
+let myScene = new  MyScene();
 
-// Crear la cámara
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.z = 5;
 
-// Crear el renderizador
-const renderer = new THREE.WebGLRenderer();
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
+let scene = myScene.getScene;
 
 // Crear una geometría de cubo
 const geometry = new THREE.BoxGeometry();
@@ -22,17 +17,27 @@ const cube = new THREE.Mesh(geometry, material);
 // Añadir el cubo a la escena
 scene.add(cube);
 
-// Función de animación
-function animate() {
-  requestAnimationFrame(animate);
 
-  // Rotar el cubo
-  cube.rotation.x += 0.01;
-  cube.rotation.y += 0.01;
+createFloor(scene);
 
-  // Renderizar la escena desde la perspectiva de la cámara
-  renderer.render(scene, camera);
+function createFloor(scene:THREE.Scene){
+  // Cargar la textura del suelo
+  const textureLoader = new THREE.TextureLoader();
+  const groundTexture = textureLoader.load(groundTextureImage);
+  console.log(groundTexture);
+  groundTexture.wrapS = THREE.RepeatWrapping;
+  groundTexture.wrapT = THREE.RepeatWrapping;
+  groundTexture.repeat.set(20, 20);
+
+  // Crear un material con la textura
+  const groundMaterial = new THREE.MeshBasicMaterial({ map: groundTexture });
+
+  // Crear una geometría de plano para el suelo
+  const groundGeometry = new THREE.PlaneGeometry(100, 100);
+
+  // Crear la malla combinando geometría y material
+  const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+  ground.rotation.x = -Math.PI/2;
+  ground.position.y=-1;
+  scene.add(ground);
 }
-
-// Iniciar la animación
-animate();

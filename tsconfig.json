@@ -1,11 +1,18 @@
 {
-    "compilerOptions": {
-      "target": "es6",
-      "module": "es6",
-      "strict": true,
-      "esModuleInterop": true,
-      "skipLibCheck": true,
-      "forceConsistentCasingInFileNames": true
+  "compilerOptions": {
+    "target": "es5",
+    "module": "NodeNext",
+    "moduleResolution": "nodenext",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "strictPropertyInitialization": false,
+    "baseUrl": "./",
+    "paths": {
+      "*": ["src/*"]
     },
-    "include": ["src"]
-  }
+    "typeRoots": ["node_modules/@types", "src/declarations.d.ts"]
+  },
+  "include": ["src"]
+}

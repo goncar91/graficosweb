@@ -6,7 +6,7 @@ import { Movement } from "./Movement";
 let myScene = new MyScene();
 const scene = myScene.getScene;
 
-let movement = new Movement(myScene);
+//let movement = new Movement(myScene);
 
 // Crear una geometría de cubo
 const geometry = new THREE.BoxGeometry();

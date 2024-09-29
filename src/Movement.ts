@@ -12,12 +12,17 @@ export class Movement {
   private moveLeft = false;
   private moveRight = false;
 
-  // Rotación. Ratón
-  private mouseSensitivity = 0.002;
-  private cameraPitch = 0; // Para limitar la rotación vertical
+  private running = false;
+  private speedRun = this.moveSpeed * 2;
 
-  private velocity = new THREE.Vector3();
-  private direction = new THREE.Vector3();
+  private isJump = false;
+  private velocity = 0;
+  private gravity = -9.8;
+  private jumpStrength = 5;
+  private cubePositionY = 0;
+
+  private prevTime = 0;
+
   private controls: PointerLockControls;
 
   constructor(myscene: MyScene) {
@@ -28,6 +33,7 @@ export class Movement {
     );
     // Event listeners para detectar las pulsaciones de teclas
     document.addEventListener("keydown", (event) => {
+      console.log("event.key", event.key);
       switch (event.key) {
         case "w":
           this.moveForward = true;
@@ -40,6 +46,12 @@ export class Movement {
           break;
         case "d":
           this.moveRight = true;
+          break;
+        case " ":
+          this.isJump = true;
+          break;
+        case "Shift":
+          this.running = true;
           break;
       }
     });
@@ -57,6 +69,12 @@ export class Movement {
           break;
         case "d":
           this.moveRight = false;
+          break;
+        case " ":
+          this.isJump = false;
+          break;
+        case "Shift":
+          this.running = false;
           break;
       }
     });
@@ -77,10 +95,10 @@ export class Movement {
       console.log("Pointer unlocked");
     });
 
-    this.animate();
+    this.animate(0);
   }
 
-  private updateMovement() {
+  private updateMovement(delta: number) {
     const camera = this.myScene.getCamera;
     const direction = new THREE.Vector3();
 
@@ -105,39 +123,30 @@ export class Movement {
       direction.setFromMatrixColumn(camera.matrix, 0);
       camera.position.addScaledVector(direction, this.moveSpeed);
     }
+
+    if (this.isJump) {
+      this.velocity += this.gravity * delta;
+      this.cubePositionY += this.velocity * delta;
+
+      if (camera.position.y <= 1) {
+        camera.position.y = 1;
+        this.isJump = false;
+        this.velocity = 0;
+      }
+
+      camera.position.y = this.cubePositionY;
+    }
   }
 
   // Actualizar y renderizar la escena
-  private animate() {
+  private animate(time: number) {
     requestAnimationFrame(this.animate.bind(this));
-    this.updateMovement();
-    this.myScene.getRenderer.render(
-      this.myScene.getScene,
-      this.myScene.getCamera
-    );
-  }
 
-  private updateRotation(event: MouseEvent) {
-    if (this.controls.isLocked) {
-      // Calcular la dirección del movimiento
-      this.direction.z = Number(this.moveForward) - Number(this.moveBackward);
-      this.direction.x = Number(this.moveRight) - Number(this.moveLeft);
-      this.direction.normalize(); // Esta asegura que la diagonal no sea más rápida
+    // Calcular delta en segundos
+    const delta = (time - this.prevTime) / 1000;
+    this.prevTime = time;
 
-      if (this.moveForward || this.moveBackward)
-        this.velocity.z -= this.direction.z * this.moveSpeed * 0.1;
-      if (this.moveLeft || this.moveRight)
-        this.velocity.x -= this.direction.x * this.moveSpeed * 0.1;
-
-      // Desplazar la cámara
-      this.controls.moveRight(-this.velocity.x * 0.1);
-      this.controls.moveForward(-this.velocity.z * 0.1);
-
-      // Aplicar fricción
-      this.velocity.x -= this.velocity.x * 0.1;
-      this.velocity.z -= this.velocity.z * 0.1;
-    }
-
+    this.updateMovement(delta);
     this.myScene.getRenderer.render(
       this.myScene.getScene,
       this.myScene.getCamera

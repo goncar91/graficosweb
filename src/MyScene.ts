@@ -1,41 +1,26 @@
 import * as THREE from "three";
 import Player from "./Player";
+import { Movement } from "./Movement";
 
 export class MyScene {
   private scene: THREE.Scene;
-  private camera: THREE.PerspectiveCamera;
   private renderer: THREE.Renderer;
+  private camera: THREE.PerspectiveCamera;
   private player: Player;
+  private movement: Movement;
 
   constructor() {
     this.scene = this.createScene();
-    this.camera = this.createCamera();
     this.renderer = this.createRenderer();
-
-    // Crea un objeto 3D que representará al jugador (puede ser un cubo simple)
-    const playerGeometry = new THREE.BoxGeometry(1, 1, 1);
-    const playerMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-    const playerMesh = new THREE.Mesh(playerGeometry, playerMaterial);
-
-    this.player = new Player(playerMesh);
-    this.scene.add(playerMesh);
-
-    this.animate(0);
+    this.camera = this.createCamera();
+    this.player = new Player();
+    this.scene.add(this.player.getMesh);
+    this.movement = new Movement(this);
+    this.animate();
   }
 
   createScene() {
     return new THREE.Scene();
-  }
-
-  createCamera() {
-    const camara = new THREE.PerspectiveCamera(
-      75,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      1000
-    );
-    camara.position.set(0, 1, 5);
-    return camara;
   }
 
   createRenderer() {
@@ -45,14 +30,22 @@ export class MyScene {
     return renderer;
   }
 
-  animate(time: number) {
-    requestAnimationFrame(() => this.animate(time));
+  createCamera() {
+    let camera = new THREE.PerspectiveCamera(
+      75,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      1000
+    );
+    camera.position.set(0, 1, 5);
+    return camera;
+  }
+
+  animate() {
+    requestAnimationFrame(() => this.animate());
     // Actualizar lógica de animación
 
-    const delta = time * 0.001; // Convertir el tiempo a segundos
-    this.player.update(delta);
-
-    this.renderer.render(this.scene, this.camera);
+    this.renderer.render(this.scene, this.getCamera);
   }
 
   public get getScene(): THREE.Scene {

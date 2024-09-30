@@ -13,13 +13,11 @@ export class Movement {
   private moveRight = false;
 
   private running = false;
-  private speedRun = this.moveSpeed * 2;
 
   private isJump = false;
-  private velocity = 0;
-  private gravity = -9.8;
-  private jumpStrength = 5;
-  private cubePositionY = 0;
+  private velocity = new THREE.Vector3(0, 0, 0);
+  private gravity = new THREE.Vector3(0, -9.8, 0);
+  private jumpStrength = new THREE.Vector3(0, 5, 0);
 
   private prevTime = 0;
 
@@ -48,7 +46,7 @@ export class Movement {
           this.moveRight = true;
           break;
         case " ":
-          this.isJump = true;
+          this.jump();
           break;
         case "Shift":
           this.running = true;
@@ -71,7 +69,7 @@ export class Movement {
           this.moveRight = false;
           break;
         case " ":
-          this.isJump = false;
+          this.isJump;
           break;
         case "Shift":
           this.running = false;
@@ -125,16 +123,22 @@ export class Movement {
     }
 
     if (this.isJump) {
-      this.velocity += this.gravity * delta;
-      this.cubePositionY += this.velocity * delta;
+      this.velocity.add(this.gravity.clone().multiplyScalar(delta));
+      camera.position.add(this.velocity.clone().multiplyScalar(delta));
 
+      // Detectar colisión con el suelo
       if (camera.position.y <= 1) {
         camera.position.y = 1;
         this.isJump = false;
-        this.velocity = 0;
+        this.velocity.set(0, 0, 0);
       }
+    }
+  }
 
-      camera.position.y = this.cubePositionY;
+  private jump() {
+    if (!this.isJump) {
+      this.isJump = true;
+      this.velocity.copy(this.jumpStrength);
     }
   }
 
@@ -151,5 +155,9 @@ export class Movement {
       this.myScene.getScene,
       this.myScene.getCamera
     );
+  }
+
+  public get getRunning() {
+    return this.running;
   }
 }
